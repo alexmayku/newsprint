@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_190223) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_215416) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,6 +27,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_190223) do
     t.index ["user_id"], name: "index_newsletters_on_user_id"
   end
 
+  create_table "newspapers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "delivery_address", default: {}, null: false
+    t.integer "frequency"
+    t.bigint "newsletter_ids", default: [], null: false, array: true
+    t.bigint "newspaper_id"
+    t.integer "order_type", default: 0, null: false
+    t.integer "page_count", null: false
+    t.string "pdf_url"
+    t.integer "status", default: 0, null: false
+    t.string "stripe_payment_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["newspaper_id"], name: "index_orders_on_newspaper_id"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.jsonb "delivery_address"
@@ -38,4 +60,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_190223) do
   end
 
   add_foreign_key "newsletters", "users"
+  add_foreign_key "orders", "newspapers"
+  add_foreign_key "orders", "users"
 end
