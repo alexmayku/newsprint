@@ -37,4 +37,18 @@ class UserTest < ActiveSupport::TestCase
     user = User.new(email: "stripe@example.com", stripe_customer_id: nil)
     assert user.valid?
   end
+
+  test "user.newsletters returns a collection" do
+    user = User.create!(email: "newsletters@example.com")
+    assert_respond_to user, :newsletters
+    assert_kind_of ActiveRecord::Associations::CollectionProxy, user.newsletters
+  end
+
+  test "user.newsletters.count is correct after creating newsletters" do
+    user = User.create!(email: "count@example.com")
+    assert_equal 0, user.newsletters.count
+    Newsletter.create!(user: user, sender_email: "a@example.com", title: "A", est_pages: 2, latest_issue_date: Time.current)
+    Newsletter.create!(user: user, sender_email: "b@example.com", title: "B", est_pages: 3, latest_issue_date: Time.current)
+    assert_equal 2, user.newsletters.count
+  end
 end
