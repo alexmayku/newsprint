@@ -1,0 +1,8 @@
+sarahs_order:
+  user: sarah
+  order_type: 0
+  status: 0
+  page_count: 10
+  stripe_payment_id: pi_test_123
+  delivery_address: '<%= { "line1" => "123 Main St", "city" => "London", "postcode" => "SW1A 1AA", "country" => "GB" }.to_json %>'
+  newsletter_ids: '{1,2}'

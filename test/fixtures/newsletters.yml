@@ -1,0 +1,20 @@
+substack_one:
+  user: sarah
+  sender_email: writer@substack.com
+  title: "The Writer's Digest"
+  est_pages: 4
+  latest_issue_date: <%= 1.day.ago %>
+
+beehiiv_one:
+  user: sarah
+  sender_email: news@beehiiv.com
+  title: Tech Roundup
+  est_pages: 6
+  latest_issue_date: <%= 2.days.ago %>
+
+mailchimp_one:
+  user: james
+  sender_email: digest@mail.mailchimp.com
+  title: Design Weekly
+  est_pages: 3
+  latest_issue_date: <%= 3.days.ago %>
