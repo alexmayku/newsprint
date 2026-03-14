@@ -8,6 +8,13 @@ Minitest::Reporters.use! Minitest::Reporters::DefaultReporter.new
 
 WebMock.disable_net_connect!(allow_localhost: true)
 
+OmniAuth.config.test_mode = true
+OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new({
+  provider: "google_oauth2", uid: "123456",
+  info: { email: "sarah@example.com", name: "Sarah" },
+  credentials: { token: "mock_token", refresh_token: "mock_refresh" }
+})
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers
