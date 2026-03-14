@@ -33,9 +33,50 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Background jobs & caching
+gem "sidekiq", "~> 7.0"
+gem "redis", "~> 5.0"
+
+# Inertia.js + Vite
+gem "inertia_rails", "~> 3.0"
+gem "vite_rails", "~> 3.0"
+
+# Authentication
+gem "omniauth", "~> 2.0"
+gem "omniauth-google-oauth2", "~> 1.0"
+gem "omniauth-rails_csrf_protection"
+
+# Gmail API
+gem "google-apis-gmail_v1"
+
+# Payments
+gem "stripe", "~> 12.0"
+
+# PDF generation
+gem "grover", "~> 1.0"
+
+# QR codes
+gem "rqrcode", "~> 2.0"
+
+# Email
+gem "postmark-rails", "~> 0.22"
+
+# Error tracking
+gem "sentry-ruby"
+gem "sentry-rails"
+
+# ActiveStorage S3
+gem "aws-sdk-s3"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+
+  # Environment variables
+  gem "dotenv-rails"
+
+  # HTTP request stubbing
+  gem "webmock"
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
@@ -56,4 +97,6 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  gem "minitest-reporters"
 end
