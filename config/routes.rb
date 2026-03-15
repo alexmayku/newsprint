@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   get "/auth/:provider/callback", to: "sessions#create"
   delete "/logout", to: "sessions#destroy"
 
-  resources :newsletters, only: [ :index ] do
+  resources :newsletters, only: [ :index, :create ] do
     collection do
       post :discover
       get "discover/:job_id/status", to: "newsletters#discover_status", as: :discover_status
