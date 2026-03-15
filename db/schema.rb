@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_15_075800) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_15_081031) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -62,6 +62,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_075800) do
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
+  create_table "qr_references", force: :cascade do |t|
+    t.bigint "article_id", null: false
+    t.datetime "created_at", null: false
+    t.string "label", null: false
+    t.text "qr_svg"
+    t.integer "reference_number", null: false
+    t.datetime "updated_at", null: false
+    t.text "url", null: false
+    t.index ["article_id"], name: "index_qr_references_on_article_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.jsonb "delivery_address"
@@ -76,4 +87,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_075800) do
   add_foreign_key "newsletters", "users"
   add_foreign_key "orders", "newspapers"
   add_foreign_key "orders", "users"
+  add_foreign_key "qr_references", "articles"
 end
