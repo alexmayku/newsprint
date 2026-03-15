@@ -1,6 +1,7 @@
 class Article < ApplicationRecord
   belongs_to :newsletter
   has_many :qr_references, dependent: :destroy
+  has_many_attached :images
 
   validates :title, presence: true
   validates :body_html, presence: true
