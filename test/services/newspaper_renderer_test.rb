@@ -5,7 +5,14 @@ class NewspaperRendererTest < ActiveSupport::TestCase
     user = User.create!(email: "renderer@example.com")
     newsletter = Newsletter.create!(user: user, sender_email: "r@example.com",
                                     title: "Renderer Newsletter", est_pages: 4, latest_issue_date: Time.current)
-    Article.create!(newsletter: newsletter, title: "Test Article", body_html: "<p>Content here</p>")
+    @article = Article.create!(
+      newsletter: newsletter,
+      title: "Test Article",
+      author: "Jane Doe",
+      body_html: '<p>Read <a href="https://example.com/link1">this article</a> and <a href="https://example.com/link2">this one</a></p>',
+      link_urls: [ "https://example.com/link1", "https://example.com/link2" ]
+    )
+    QrCodeGenerator.generate_for_article(@article, offset: 0)
 
     @newspaper = Newspaper.create!(user: user, newsletters: [ newsletter ])
     @html = NewspaperRenderer.new(@newspaper).to_html
@@ -46,5 +53,48 @@ class NewspaperRendererTest < ActiveSupport::TestCase
 
   test "front page contains the edition number" do
     assert_includes @html, "Edition #{@newspaper.edition_number}"
+  end
+
+  # Part 2 tests
+
+  test "each article appears in a section with class article" do
+    assert_match(/<div class="article">/, @html)
+  end
+
+  test "article titles appear as h1 elements" do
+    assert_match(/<h1>Test Article<\/h1>/, @html)
+  end
+
+  test "article author appears in a byline element" do
+    assert_match(/class="byline".*Jane Doe/m, @html)
+  end
+
+  test "article body_html is included" do
+    assert_includes @html, "this article"
+  end
+
+  test "links in body_html are augmented with superscript reference markers" do
+    assert_match(/this article<\/a><sup class="qr-ref">\[1\]<\/sup>/, @html)
+    assert_match(/this one<\/a><sup class="qr-ref">\[2\]<\/sup>/, @html)
+  end
+
+  test "front page TOC lists each article title with its author" do
+    assert_match(/Test Article.*Jane Doe/m, @html)
+  end
+
+  test "Links and References section appears with class qr-appendix" do
+    assert_match(/class="qr-appendix"/, @html)
+    assert_includes @html, "Links &amp; References"
+  end
+
+  test "each QR reference in appendix includes SVG, reference number, label, and URL" do
+    assert_includes @html, "<svg"
+    assert_match(/\[1\]/, @html)
+    assert_includes @html, "link1"
+    assert_includes @html, "https://example.com/link1"
+  end
+
+  test "QR codes in appendix use qr-grid CSS class" do
+    assert_match(/class="qr-grid"/, @html)
   end
 end

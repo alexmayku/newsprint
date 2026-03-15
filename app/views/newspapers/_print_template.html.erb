@@ -99,11 +99,15 @@
       margin-bottom: 10mm;
     }
 
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5mm;
+    }
+
     .qr-item {
-      display: inline-block;
-      width: 45%;
+      text-align: center;
       margin-bottom: 8mm;
-      vertical-align: top;
     }
 
     .qr-item svg {
@@ -114,6 +118,17 @@
     .qr-item .qr-label {
       font-size: 8pt;
       color: #333;
+    }
+
+    .qr-item .qr-url {
+      font-size: 6pt;
+      color: #999;
+      word-break: break-all;
+    }
+
+    .qr-ref {
+      color: #666;
+      font-size: 7pt;
     }
   </style>
 </head>
@@ -128,7 +143,7 @@
       <h2>In This Issue</h2>
       <ul>
         <% articles.each do |article| %>
-          <li><%= article.title %></li>
+          <li><%= article.title %><% if article.author.present? %> — <em><%= article.author %></em><% end %></li>
         <% end %>
       </ul>
     </div>
@@ -141,7 +156,7 @@
     <% if article.author.present? %>
       <div class="byline">By <%= article.author %></div>
     <% end %>
-    <%= article.body_html %>
+    <%= inject_qr_superscripts(article.body_html, article.qr_references) %>
   </div>
   <% end %>
 
@@ -149,13 +164,16 @@
   <% if all_qr_refs.any? %>
   <div class="qr-appendix">
     <h2>Links &amp; References</h2>
+    <div class="qr-grid">
     <% all_qr_refs.each do |qr| %>
       <div class="qr-item">
         <div class="qr-ref-number">[<%= qr.reference_number %>]</div>
         <%= qr.qr_svg %>
         <div class="qr-label"><%= qr.label %></div>
+        <div class="qr-url"><%= qr.url %></div>
       </div>
     <% end %>
+    </div>
   </div>
   <% end %>
 </body>

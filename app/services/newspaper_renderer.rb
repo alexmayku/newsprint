@@ -15,4 +15,23 @@ class NewspaperRenderer
 
     template.result(binding)
   end
+
+  def inject_qr_superscripts(body_html, qr_references)
+    doc = Nokogiri::HTML.fragment(body_html)
+
+    qr_by_url = qr_references.index_by(&:url)
+
+    doc.css("a").each do |link|
+      href = link["href"]
+      qr = qr_by_url[href]
+      next unless qr
+
+      sup = Nokogiri::XML::Node.new("sup", doc)
+      sup["class"] = "qr-ref"
+      sup.content = "[#{qr.reference_number}]"
+      link.add_next_sibling(sup)
+    end
+
+    doc.to_html
+  end
 end
