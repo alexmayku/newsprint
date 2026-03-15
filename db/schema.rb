@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_15_195552) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_15_200612) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -68,9 +68,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_195552) do
     t.index ["user_id"], name: "index_newsletters_on_user_id"
   end
 
+  create_table "newsletters_newspapers", id: false, force: :cascade do |t|
+    t.bigint "newsletter_id", null: false
+    t.bigint "newspaper_id", null: false
+    t.index ["newsletter_id", "newspaper_id"], name: "index_newsletters_newspapers_on_newsletter_id_and_newspaper_id"
+    t.index ["newspaper_id", "newsletter_id"], name: "index_newsletters_newspapers_on_newspaper_id_and_newsletter_id", unique: true
+  end
+
   create_table "newspapers", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "edition_number", default: 0, null: false
+    t.datetime "generated_at"
+    t.integer "page_count"
+    t.integer "status", default: 0, null: false
+    t.string "title", default: "", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_newspapers_on_user_id"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -115,6 +129,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_195552) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "articles", "newsletters"
   add_foreign_key "newsletters", "users"
+  add_foreign_key "newspapers", "users"
   add_foreign_key "orders", "newspapers"
   add_foreign_key "orders", "users"
   add_foreign_key "qr_references", "articles"
