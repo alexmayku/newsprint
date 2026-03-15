@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  skip_before_action :require_authentication
+
   def create
     auth = request.env["omniauth.auth"]
     user = User.find_or_create_by!(email: auth.info.email)
