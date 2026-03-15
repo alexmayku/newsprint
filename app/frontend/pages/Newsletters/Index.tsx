@@ -36,12 +36,20 @@ export default function Index({ newsletters, maxPages }: Props) {
     })
   }
 
+  const handleScanInbox = () => {
+    router.post("/newsletters/discover")
+  }
+
   return (
     <AppLayout>
       <div className="newsletters">
         <h1>Your Newsletters</h1>
+        <button onClick={handleScanInbox} className="btn-secondary" data-testid="scan-btn">
+          Scan Inbox
+        </button>
+
         {newsletters.length === 0 ? (
-          <p>No newsletters found. Try scanning your inbox.</p>
+          <p>No newsletters found yet. Click "Scan Inbox" to discover your newsletters.</p>
         ) : (
           <>
             <ul className="newsletter-list">

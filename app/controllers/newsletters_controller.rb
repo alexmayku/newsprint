@@ -32,7 +32,7 @@ class NewslettersController < ApplicationController
   def discover
     job_id = SecureRandom.uuid
     ScanNewslettersJob.perform_later(current_user.id, job_id)
-    render json: { job_id: job_id }
+    render inertia: "Newsletters/Discovering", props: { jobId: job_id }
   end
 
   def discover_status

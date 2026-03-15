@@ -36,13 +36,12 @@ class NewslettersControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "32"
   end
 
-  test "POST /newsletters/discover returns JSON with job_id" do
+  test "POST /newsletters/discover renders Discovering page with jobId" do
     post discover_newsletters_path
 
     assert_response :success
-    json = JSON.parse(response.body)
-    assert json.key?("job_id")
-    assert json["job_id"].present?
+    assert_includes response.body, "Newsletters/Discovering"
+    assert_includes response.body, "jobId"
   end
 
   test "GET /newsletters/discover/:job_id/status returns JSON with status from Redis" do
