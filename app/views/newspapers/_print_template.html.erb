@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= newspaper.title %></title>
+  <style>
+    @page {
+      size: 280mm 400mm;
+      margin: 15mm;
+      marks: crop;
+      bleed: 3mm;
+    }
+
+    body {
+      font-family: Georgia, serif;
+      font-size: 10pt;
+      line-height: 14pt;
+      color: #1a1a1a;
+    }
+
+    .front-page {
+      break-after: page;
+      text-align: center;
+      padding-top: 80mm;
+    }
+
+    .front-page h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 48pt;
+      line-height: 1.1;
+      margin-bottom: 10mm;
+    }
+
+    .front-page .date {
+      font-size: 14pt;
+      margin-bottom: 5mm;
+    }
+
+    .front-page .edition {
+      font-size: 12pt;
+      color: #666;
+      margin-bottom: 20mm;
+    }
+
+    .front-page .toc {
+      text-align: left;
+      max-width: 200mm;
+      margin: 0 auto;
+    }
+
+    .front-page .toc h2 {
+      font-size: 16pt;
+      margin-bottom: 5mm;
+    }
+
+    .front-page .toc ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .front-page .toc li {
+      font-size: 11pt;
+      margin-bottom: 3mm;
+    }
+
+    .article {
+      break-before: page;
+      column-count: 2;
+      column-gap: 10mm;
+    }
+
+    .article h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 24pt;
+      line-height: 1.2;
+      column-span: all;
+      margin-bottom: 5mm;
+    }
+
+    .article .byline {
+      font-style: italic;
+      font-size: 9pt;
+      color: #666;
+      column-span: all;
+      margin-bottom: 5mm;
+    }
+
+    .article img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .qr-appendix {
+      break-before: page;
+    }
+
+    .qr-appendix h2 {
+      font-size: 18pt;
+      margin-bottom: 10mm;
+    }
+
+    .qr-item {
+      display: inline-block;
+      width: 45%;
+      margin-bottom: 8mm;
+      vertical-align: top;
+    }
+
+    .qr-item svg {
+      width: 20mm;
+      height: 20mm;
+    }
+
+    .qr-item .qr-label {
+      font-size: 8pt;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="front-page">
+    <h1><%= newspaper.title %></h1>
+    <div class="date"><%= date %></div>
+    <div class="edition">Edition <%= edition %></div>
+
+    <% if articles.any? %>
+    <div class="toc">
+      <h2>In This Issue</h2>
+      <ul>
+        <% articles.each do |article| %>
+          <li><%= article.title %></li>
+        <% end %>
+      </ul>
+    </div>
+    <% end %>
+  </div>
+
+  <% articles.each do |article| %>
+  <div class="article">
+    <h1><%= article.title %></h1>
+    <% if article.author.present? %>
+      <div class="byline">By <%= article.author %></div>
+    <% end %>
+    <%= article.body_html %>
+  </div>
+  <% end %>
+
+  <% all_qr_refs = articles.flat_map(&:qr_references) %>
+  <% if all_qr_refs.any? %>
+  <div class="qr-appendix">
+    <h2>Links &amp; References</h2>
+    <% all_qr_refs.each do |qr| %>
+      <div class="qr-item">
+        <div class="qr-ref-number">[<%= qr.reference_number %>]</div>
+        <%= qr.qr_svg %>
+        <div class="qr-label"><%= qr.label %></div>
+      </div>
+    <% end %>
+  </div>
+  <% end %>
+</body>
+</html>
