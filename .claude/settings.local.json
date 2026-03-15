@@ -9,7 +9,9 @@
       "Bash(bin/rails active_storage:install 2>&1)",
       "Bash(which npx:*)",
       "Bash(bundle install:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(which gs:*)",
+      "Bash(brew install:*)"
     ]
   }
 }
