@@ -54,6 +54,7 @@ gem "stripe", "~> 12.0"
 
 # PDF generation
 gem "grover", "~> 1.0"
+gem "pdf-reader", "~> 2.0"
 
 # QR codes
 gem "rqrcode", "~> 2.0"
