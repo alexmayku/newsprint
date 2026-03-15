@@ -1,5 +1,6 @@
 class Newsletter < ApplicationRecord
   belongs_to :user
+  has_many :articles, dependent: :destroy
 
   validates :sender_email, presence: true
   validates :title, presence: true

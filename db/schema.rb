@@ -10,9 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_215416) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_15_075800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "articles", force: :cascade do |t|
+    t.string "author"
+    t.text "body_html", null: false
+    t.datetime "created_at", null: false
+    t.text "image_urls", default: [], array: true
+    t.text "link_urls", default: [], array: true
+    t.bigint "newsletter_id", null: false
+    t.integer "position", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["newsletter_id"], name: "index_articles_on_newsletter_id"
+  end
 
   create_table "newsletters", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -59,6 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_215416) do
     t.index "lower((email)::text)", name: "index_users_on_LOWER_email", unique: true
   end
 
+  add_foreign_key "articles", "newsletters"
   add_foreign_key "newsletters", "users"
   add_foreign_key "orders", "newspapers"
   add_foreign_key "orders", "users"
