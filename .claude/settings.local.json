@@ -4,7 +4,8 @@
       "Bash(bin/rails test:*)",
       "Bash(bin/rails generate:*)",
       "Bash(bin/rails db:migrate 2>&1)",
-      "Bash(bin/rails db:migrate && bin/rails test test/models/qr_reference_test.rb 2>&1)"
+      "Bash(bin/rails db:migrate && bin/rails test test/models/qr_reference_test.rb 2>&1)",
+      "Bash(bin/rails runner:*)"
     ]
   }
 }
