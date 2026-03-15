@@ -3,5 +3,6 @@ class PagesController < ApplicationController
 
   def home
     redirect_to newsletters_path if logged_in?
+    render inertia: "Home" unless performed?
   end
 end
