@@ -1,0 +1,24 @@
+{
+  "id": "msg_1",
+  "threadId": "thread_1",
+  "labelIds": ["INBOX"],
+  "payload": {
+    "mimeType": "multipart/alternative",
+    "headers": [
+      { "name": "From", "value": "Writer Name <writer@substack.com>" },
+      { "name": "Subject", "value": "Weekly Digest #42" },
+      { "name": "Date", "value": "Mon, 10 Mar 2026 10:00:00 +0000" },
+      { "name": "List-Unsubscribe", "value": "<https://example.com/unsubscribe>" }
+    ],
+    "parts": [
+      {
+        "mimeType": "text/plain",
+        "body": { "data": "UGxhaW4gdGV4dCB2ZXJzaW9u" }
+      },
+      {
+        "mimeType": "text/html",
+        "body": { "data": "PGgxPkhlbGxvIE5ld3NsZXR0ZXI8L2gxPjxwPlRoaXMgaXMgdGhlIGJvZHkuPC9wPg==" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "msg_2",
+  "threadId": "thread_2",
+  "labelIds": ["INBOX"],
+  "payload": {
+    "mimeType": "multipart/alternative",
+    "headers": [
+      { "name": "From", "value": "Other Sender <other@example.com>" },
+      { "name": "Subject", "value": "No Unsub Header" },
+      { "name": "Date", "value": "Tue, 11 Mar 2026 12:00:00 +0000" }
+    ],
+    "parts": [
+      {
+        "mimeType": "text/plain",
+        "body": { "data": "UGxhaW4gdGV4dCB2ZXJzaW9u" }
+      },
+      {
+        "mimeType": "text/html",
+        "body": { "data": "PGgxPkhlbGxvIE5ld3NsZXR0ZXI8L2gxPjxwPlRoaXMgaXMgdGhlIGJvZHkuPC9wPg==" }
+      }
+    ]
+  }
+}
