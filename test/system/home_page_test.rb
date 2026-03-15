@@ -6,8 +6,8 @@ class HomePageTest < ApplicationSystemTestCase
     assert_text "Newsprint"
   end
 
-  test "page has Connect Gmail link" do
+  test "page has Connect Gmail button" do
     visit root_path
-    assert_link "Connect Gmail"
+    assert_button "Connect Gmail"
   end
 end

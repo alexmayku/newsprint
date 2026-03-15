@@ -19,7 +19,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :newspapers, only: [ :create ]
+  resources :newspapers, only: [ :create ] do
+    member do
+      get :status
+      get :preview
+      get :pdf
+    end
+  end
 
   # Defines the root path route ("/")
   root "pages#home"

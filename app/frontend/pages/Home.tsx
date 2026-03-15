@@ -7,9 +7,14 @@ export default function Home() {
       <div className="home">
         <h1>Newsprint</h1>
         <p>Turn your favourite email newsletters into a beautiful printed newspaper.</p>
-        <a href="/auth/google_oauth2" className="btn-primary">
-          Connect Gmail
-        </a>
+        <form action="/auth/google_oauth2" method="post">
+          <input type="hidden" name="authenticity_token" value={
+            document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || ""
+          } />
+          <button type="submit" className="btn-primary">
+            Connect Gmail
+          </button>
+        </form>
       </div>
     </AppLayout>
   )
