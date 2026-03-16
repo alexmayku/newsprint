@@ -73,9 +73,20 @@ class NewspaperRendererTest < ActiveSupport::TestCase
     assert_includes @html, "this article"
   end
 
-  test "links in body_html are augmented with superscript reference markers" do
-    assert_match(/this article<\/a><sup class="qr-ref">\[1\]<\/sup>/, @html)
-    assert_match(/this one<\/a><sup class="qr-ref">\[2\]<\/sup>/, @html)
+  test "links are unwrapped to plain text with QR superscript references" do
+    assert_not_includes @html, "<a href="
+    assert_match(/this article<sup class="qr-ref">\[1\]<\/sup>/, @html)
+    assert_match(/this one<sup class="qr-ref">\[2\]<\/sup>/, @html)
+  end
+
+  test "links without QR references are unwrapped without superscript" do
+    renderer = NewspaperRenderer.new(@newspaper)
+    html = '<p>Visit <a href="https://no-qr.example.com">this site</a> for info</p>'
+    result = renderer.prepare_body_for_print(html, @article.qr_references)
+
+    assert_includes result, "Visit this site for info"
+    assert_not_includes result, "<a "
+    assert_not_includes result, "no-qr.example.com"
   end
 
   test "front page TOC lists each article title with its author" do

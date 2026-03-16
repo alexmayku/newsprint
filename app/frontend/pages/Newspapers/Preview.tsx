@@ -28,7 +28,8 @@ const STATUS_MESSAGES: Record<string, string> = {
 
 export default function Preview({ newspaper, jobId }: Props) {
   const [status, setStatus] = useState(newspaper.status)
-  const [viewMode, setViewMode] = useState<"single" | "spread">("single")
+  const [currentPage, setCurrentPage] = useState(1)
+  const totalPages = newspaper.page_count || 1
 
   useEffect(() => {
     if (status === "generated" || status === "failed") return
@@ -61,6 +62,12 @@ export default function Preview({ newspaper, jobId }: Props) {
   const handleRetry = () => {
     const newsletterIds = newspaper.newsletters.map((n) => n.id)
     router.post("/newspapers", { newsletter_ids: newsletterIds })
+  }
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
   }
 
   if (status === "failed") {
@@ -101,44 +108,74 @@ export default function Preview({ newspaper, jobId }: Props) {
     )
   }
 
+  const pdfSrc = newspaper.pdf_url
+    ? `${newspaper.pdf_url}#page=${currentPage}`
+    : undefined
+
   return (
     <AppLayout>
       <div className="newspaper-preview">
         <div className="preview-header">
-          <h1>{newspaper.title}</h1>
-          <p>Edition {newspaper.edition_number}</p>
-          {newspaper.page_count && <p data-testid="page-count">{newspaper.page_count} pages</p>}
-          {newspaper.generated_at && (
-            <p className="generated-date">
-              Generated {new Date(newspaper.generated_at).toLocaleDateString()}
-            </p>
-          )}
-        </div>
-
-        <div className="preview-actions">
-          <div className="view-toggle">
-            <button
-              className={viewMode === "single" ? "active" : ""}
-              onClick={() => setViewMode("single")}
-            >
-              Single Page
-            </button>
-            <button
-              className={viewMode === "spread" ? "active" : ""}
-              onClick={() => setViewMode("spread")}
-            >
-              Spread View
-            </button>
+          <div className="preview-title-row">
+            <div>
+              <h1>{newspaper.title}</h1>
+              <p>Edition {newspaper.edition_number}</p>
+              {newspaper.page_count && <p data-testid="page-count">{newspaper.page_count} pages</p>}
+              {newspaper.generated_at && (
+                <p className="generated-date">
+                  Generated {new Date(newspaper.generated_at).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+            <div className="preview-header-actions">
+              {newspaper.pdf_url && (
+                <a
+                  href={newspaper.pdf_url}
+                  className="btn-primary"
+                  target="_blank"
+                  rel="noopener"
+                  data-testid="download-pdf"
+                >
+                  Download PDF
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
         {newspaper.pdf_url && (
-          <div className={`pdf-viewer ${viewMode}`}>
-            <iframe
-              src={newspaper.pdf_url}
-              title="Newspaper Preview"
-              className="pdf-iframe"
-            />
+          <div className="pdf-viewer-container">
+            <div className="pdf-navigation">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+                data-testid="prev-page"
+                className="nav-btn"
+              >
+                Previous
+              </button>
+              <span data-testid="page-indicator" className="page-indicator">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+                data-testid="next-page"
+                className="nav-btn"
+              >
+                Next
+              </button>
+            </div>
+
+            <div className="pdf-viewer">
+              <iframe
+                key={currentPage}
+                src={pdfSrc}
+                title="Newspaper Preview"
+                className="pdf-iframe"
+                data-testid="pdf-iframe"
+              />
+            </div>
           </div>
         )}
 
@@ -164,6 +201,101 @@ export default function Preview({ newspaper, jobId }: Props) {
           </ul>
         </div>
       </div>
+
+      <style>{`
+        .newspaper-preview {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .preview-title-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 20px;
+        }
+        .preview-header-actions {
+          display: flex;
+          gap: 10px;
+        }
+        .pdf-viewer-container {
+          margin: 20px 0;
+        }
+        .pdf-navigation {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+          padding: 12px;
+          background: #f7f7f7;
+          border: 1px solid #ddd;
+          border-bottom: none;
+          border-radius: 8px 8px 0 0;
+        }
+        .nav-btn {
+          padding: 8px 16px;
+          border: 1px solid #ccc;
+          background: white;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+        .nav-btn:hover:not(:disabled) {
+          background: #eee;
+        }
+        .nav-btn:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+        .page-indicator {
+          font-size: 14px;
+          font-weight: 600;
+          min-width: 80px;
+          text-align: center;
+        }
+        .pdf-viewer {
+          border: 1px solid #ddd;
+          border-radius: 0 0 8px 8px;
+          overflow: hidden;
+          background: #525659;
+        }
+        .pdf-iframe {
+          width: 100%;
+          height: 75vh;
+          border: none;
+          display: block;
+        }
+        .preview-footer {
+          display: flex;
+          gap: 12px;
+          margin: 20px 0;
+        }
+        .btn-primary {
+          padding: 10px 20px;
+          background: #1a1a1a;
+          color: white;
+          text-decoration: none;
+          border-radius: 6px;
+          border: none;
+          cursor: pointer;
+          font-size: 14px;
+        }
+        .btn-secondary {
+          padding: 10px 20px;
+          background: white;
+          color: #1a1a1a;
+          text-decoration: none;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+          cursor: pointer;
+          font-size: 14px;
+        }
+        .included-newsletters {
+          margin-top: 30px;
+          padding-top: 20px;
+          border-top: 1px solid #eee;
+        }
+      `}</style>
     </AppLayout>
   )
 }

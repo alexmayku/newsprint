@@ -126,9 +126,24 @@
       word-break: break-all;
     }
 
+    .article blockquote {
+      border-left: none;
+      margin-left: 10mm;
+      font-style: italic;
+    }
+
+    .article * {
+      font-family: inherit;
+      color: inherit;
+      background: none;
+      padding: 0;
+    }
+
     .qr-ref {
-      color: #666;
-      font-size: 7pt;
+      font-size: 6pt;
+      color: #888;
+      line-height: 0;
+      vertical-align: super;
     }
   </style>
 </head>
@@ -156,7 +171,7 @@
     <% if article.author.present? %>
       <div class="byline">By <%= article.author %></div>
     <% end %>
-    <%= inject_qr_superscripts(article.body_html, article.qr_references) %>
+    <%= prepare_body_for_print(article.body_html, article.qr_references) %>
   </div>
   <% end %>
 

@@ -53,4 +53,45 @@ class QrCodeGeneratorTest < ActiveSupport::TestCase
       assert_includes record.qr_svg, "<svg"
     end
   end
+
+  test ".generate_svg returns nil for URLs exceeding QR capacity" do
+    impossibly_long_url = "https://example.com/" + "a" * 10_000
+    result = QrCodeGenerator.generate_svg(impossibly_long_url)
+    assert_nil result
+  end
+
+  test ".generate_for_article skips URLs that exceed QR capacity" do
+    article = Article.create!(
+      newsletter: @article.newsletter,
+      title: "Mixed URLs",
+      body_html: "<p>body</p>",
+      link_urls: [
+        "https://example.com/short",
+        "https://example.com/" + "a" * 10_000,
+        "https://example.com/also-short"
+      ]
+    )
+
+    records = QrCodeGenerator.generate_for_article(article, offset: 0)
+    assert_equal 2, records.size
+    assert_equal "https://example.com/short", records[0].url
+    assert_equal "https://example.com/also-short", records[1].url
+  end
+
+  test ".generate_for_article keeps sequential reference numbers when skipping" do
+    article = Article.create!(
+      newsletter: @article.newsletter,
+      title: "Sequential Test",
+      body_html: "<p>body</p>",
+      link_urls: [
+        "https://example.com/first",
+        "https://example.com/" + "a" * 10_000,
+        "https://example.com/third"
+      ]
+    )
+
+    records = QrCodeGenerator.generate_for_article(article, offset: 0)
+    assert_equal 1, records[0].reference_number
+    assert_equal 2, records[1].reference_number
+  end
 end
