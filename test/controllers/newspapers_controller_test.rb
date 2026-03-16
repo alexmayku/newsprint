@@ -32,7 +32,7 @@ class NewspapersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
   end
 
-  test "GET /newspapers/:id/status returns JSON with status from Redis" do
+  test "GET /newspapers/:id/status returns Redis status when job is in progress" do
     newspaper = Newspaper.create!(user: @user)
     redis = Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"))
     redis.set("generate_job:newspaper_#{newspaper.id}", "rendering")
@@ -43,6 +43,41 @@ class NewspapersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "rendering", json["status"]
   ensure
     redis&.del("generate_job:newspaper_#{newspaper.id}")
+  end
+
+  test "GET /newspapers/:id/status returns DB status when newspaper is generated" do
+    newspaper = Newspaper.create!(user: @user)
+    newspaper.update!(status: :generated, generated_at: Time.current)
+
+    # Even if Redis has a stale value, DB should win
+    redis = Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"))
+    redis.set("generate_job:newspaper_#{newspaper.id}", "complete:5")
+
+    get status_newspaper_path(newspaper)
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "generated", json["status"]
+  ensure
+    redis&.del("generate_job:newspaper_#{newspaper.id}")
+  end
+
+  test "GET /newspapers/:id/status returns DB status when newspaper is failed" do
+    newspaper = Newspaper.create!(user: @user)
+    newspaper.update!(status: :failed)
+
+    get status_newspaper_path(newspaper)
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "failed", json["status"]
+  end
+
+  test "GET /newspapers/:id/status falls back to DB status when Redis has no entry" do
+    newspaper = Newspaper.create!(user: @user)
+
+    get status_newspaper_path(newspaper)
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "draft", json["status"]
   end
 
   test "GET /newspapers/:id/preview renders Inertia Newspapers/Preview" do

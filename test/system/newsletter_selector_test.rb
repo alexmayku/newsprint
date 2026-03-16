@@ -86,4 +86,9 @@ class NewsletterSelectorTest < ApplicationSystemTestCase
     # After POST, should redirect back to newsletters
     assert_current_path newsletters_path
   end
+
+  test "Scan Inbox button is visible" do
+    visit newsletters_path
+    assert_selector "[data-testid='scan-btn']", text: "Scan Inbox"
+  end
 end

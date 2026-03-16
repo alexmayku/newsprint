@@ -8,7 +8,7 @@ class ScanNewslettersJob < ApplicationJob
     redis.set("scan_job:#{job_id}", "scanning")
 
     client = gmail_client || GmailClient.new(user)
-    message_ids = client.fetch_messages(query: "newer_than:90d", max_results: 200)
+    message_ids = client.fetch_messages(query: "newer_than:30d", max_results: 200)
 
     message_details = message_ids.map { |m| client.fetch_message_detail(m[:id]) }
 

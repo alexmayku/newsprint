@@ -37,6 +37,19 @@ class ScanNewslettersJobTest < ActiveJob::TestCase
     assert fetch_called
   end
 
+  test "job scans only the last 30 days" do
+    captured_query = nil
+    mock_client = build_mock_client(
+      on_fetch_messages: ->(**args) {
+        captured_query = args[:query]
+        @message_ids
+      }
+    )
+
+    ScanNewslettersJob.perform_now(@user.id, @job_id, gmail_client: mock_client)
+    assert_includes captured_query, "newer_than:30d"
+  end
+
   test "job passes messages to NewsletterDetector" do
     mock_client = build_mock_client
     ScanNewslettersJob.perform_now(@user.id, @job_id, gmail_client: mock_client)

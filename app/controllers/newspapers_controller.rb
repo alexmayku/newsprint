@@ -19,9 +19,15 @@ class NewspapersController < ApplicationController
     newspaper = current_user.newspapers.find_by(id: params[:id])
     return head :not_found unless newspaper
 
-    redis = Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"))
-    status = redis.get("generate_job:newspaper_#{newspaper.id}") || newspaper.status
-    render json: { status: status }
+    # Prefer the DB status if the job is done
+    newspaper.reload
+    if newspaper.generated? || newspaper.failed?
+      render json: { status: newspaper.status }
+    else
+      redis = Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"))
+      status = redis.get("generate_job:newspaper_#{newspaper.id}") || newspaper.status
+      render json: { status: status }
+    end
   end
 
   def preview

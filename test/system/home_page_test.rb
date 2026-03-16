@@ -10,4 +10,10 @@ class HomePageTest < ApplicationSystemTestCase
     visit root_path
     assert_button "Connect Gmail"
   end
+
+  test "Connect Gmail button is inside a POST form" do
+    visit root_path
+    form = find("form[action='/auth/google_oauth2']")
+    assert_equal "post", form[:method]
+  end
 end

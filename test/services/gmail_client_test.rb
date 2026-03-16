@@ -61,6 +61,62 @@ class GmailClientTest < ActiveSupport::TestCase
     assert_equal "<h1>Hello Newsletter</h1><p>This is the body.</p>", result[:html_body]
   end
 
+  test "handles already-decoded (non-base64) html body data" do
+    json = @detail_json.deep_dup
+    json["payload"]["parts"][1]["body"]["data"] = "<h1>Already decoded</h1>"
+    message = build_gmail_message(json)
+    mock_service(:get_user_message, message)
+    result = @client.fetch_message_detail("msg_1")
+    assert_includes result[:html_body], "Already decoded"
+  end
+
+  test "handles message with nil Date header" do
+    json = @detail_json.deep_dup
+    json["payload"]["headers"].reject! { |h| h["name"] == "Date" }
+    message = build_gmail_message(json)
+    mock_service(:get_user_message, message)
+    result = @client.fetch_message_detail("msg_1")
+    assert_respond_to result[:date], :to_time
+    assert_in_delta Time.current.to_f, result[:date].to_f, 5
+  end
+
+  test "handles message with nil From header" do
+    json = @detail_json.deep_dup
+    json["payload"]["headers"].reject! { |h| h["name"] == "From" }
+    message = build_gmail_message(json)
+    mock_service(:get_user_message, message)
+    result = @client.fetch_message_detail("msg_1")
+    assert_nil result[:from_email]
+    assert_nil result[:from_name]
+  end
+
+  test "handles message with nil headers array" do
+    message = Google::Apis::GmailV1::Message.new(
+      id: "msg_nil_headers",
+      payload: Google::Apis::GmailV1::MessagePart.new(
+        mime_type: "text/html",
+        headers: nil,
+        body: Google::Apis::GmailV1::MessagePartBody.new(
+          data: Base64.urlsafe_encode64("<p>content</p>")
+        )
+      )
+    )
+    mock_service(:get_user_message, message)
+    result = @client.fetch_message_detail("msg_nil_headers")
+    assert_kind_of Hash, result[:headers]
+    assert result[:headers].empty?
+  end
+
+  test "handles From header without angle brackets" do
+    json = @detail_json.deep_dup
+    json["payload"]["headers"].find { |h| h["name"] == "From" }["value"] = "plain@example.com"
+    message = build_gmail_message(json)
+    mock_service(:get_user_message, message)
+    result = @client.fetch_message_detail("msg_1")
+    assert_equal "plain@example.com", result[:from_email]
+    assert_nil result[:from_name]
+  end
+
   test "raises GmailClient::ApiError when the API call fails" do
     service = @client.service
     service.define_singleton_method(:get_user_message) do |*_args|

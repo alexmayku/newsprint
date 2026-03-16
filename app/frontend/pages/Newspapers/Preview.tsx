@@ -39,15 +39,17 @@ export default function Preview({ newspaper, jobId }: Props) {
         const data = await response.json()
         const currentStatus = data.status as string
 
-        setStatus(currentStatus)
-
-        if (currentStatus.startsWith("complete") || currentStatus === "generated") {
+        if (currentStatus === "generated" || currentStatus.startsWith("complete")) {
           clearInterval(interval)
           router.reload()
-        } else if (currentStatus.startsWith("failed") || currentStatus === "failed") {
+          return
+        } else if (currentStatus === "failed" || currentStatus.startsWith("failed")) {
           clearInterval(interval)
           setStatus("failed")
+          return
         }
+
+        setStatus(currentStatus)
       } catch {
         clearInterval(interval)
       }

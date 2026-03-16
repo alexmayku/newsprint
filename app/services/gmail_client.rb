@@ -47,21 +47,25 @@ class GmailClient
       subject: headers["Subject"],
       from_email: from_email,
       from_name: from_name,
-      date: Time.parse(headers["Date"]),
+      date: headers["Date"] ? Time.parse(headers["Date"]) : Time.current,
       html_body: extract_html_body(message.payload),
       headers: headers
     }
   end
 
   def extract_headers(headers)
+    return {} if headers.nil?
+
     headers.each_with_object({}) { |h, hash| hash[h.name] = h.value }
   end
 
   def parse_from(from_string)
+    return [ nil, nil ] if from_string.nil?
+
     if from_string =~ /\A(.+?)\s*<(.+?)>\z/
       [ $1.strip, $2.strip ]
     else
-      [ nil, from_string ]
+      [ nil, from_string.strip ]
     end
   end
 
@@ -69,7 +73,15 @@ class GmailClient
     part = find_html_part(payload)
     return nil unless part&.body&.data
 
-    Base64.urlsafe_decode64(part.body.data).force_encoding("UTF-8")
+    data = part.body.data
+    # The google-apis-gmail_v1 gem may return already-decoded data
+    # Try base64url decode first, fall back to using data as-is
+    begin
+      padded = data + "=" * ((4 - data.length % 4) % 4)
+      Base64.urlsafe_decode64(padded).force_encoding("UTF-8")
+    rescue ArgumentError
+      data.force_encoding("UTF-8")
+    end
   end
 
   def find_html_part(part)

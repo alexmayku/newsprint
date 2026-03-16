@@ -120,6 +120,36 @@ class ExtractContentJobTest < ActiveJob::TestCase
     assert statuses.any? { |s| s.start_with?("complete") }
   end
 
+  test "article with nil title falls back to email subject" do
+    detail = @mock_message_detail.dup
+    # Use minimal HTML that will produce a nil title from the generic extractor
+    detail[:html_body] = "<p>Just a paragraph with no heading</p>"
+    client = Object.new
+    client.define_singleton_method(:fetch_messages) { |**_| [ { id: "msg_1" } ] }
+    client.define_singleton_method(:fetch_message_detail) { |_| detail }
+
+    ExtractContentJob.perform_now(@newsletter.id, @job_id, gmail_client: client)
+
+    article = @newsletter.articles.reload.first
+    assert_not_nil article
+    # Should fall back to subject or "Untitled", not be blank
+    assert article.title.present?, "Expected article title to be present"
+  end
+
+  test "article with nil body_html gets default body" do
+    detail = @mock_message_detail.dup
+    detail[:html_body] = nil
+    client = Object.new
+    client.define_singleton_method(:fetch_messages) { |**_| [ { id: "msg_1" } ] }
+    client.define_singleton_method(:fetch_message_detail) { |_| detail }
+
+    ExtractContentJob.perform_now(@newsletter.id, @job_id, gmail_client: client)
+
+    article = @newsletter.articles.reload.first
+    assert_not_nil article
+    assert article.body_html.present?
+  end
+
   test "GmailClient error sets status to failed" do
     error_client = Object.new
     error_client.define_singleton_method(:fetch_messages) { |**_| raise GmailClient::ApiError, "API down" }

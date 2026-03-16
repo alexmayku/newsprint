@@ -30,9 +30,9 @@ class ExtractContentJob < ApplicationJob
       qr_offset = 0
       extracted_articles.each_with_index do |article_data, index|
         article = newsletter.articles.create!(
-          title: article_data[:title],
+          title: article_data[:title].presence || metadata[:subject].presence || "Untitled",
           author: article_data[:author],
-          body_html: article_data[:body_html],
+          body_html: article_data[:body_html].presence || "<p></p>",
           position: index,
           image_urls: article_data[:image_urls] || [],
           link_urls: article_data[:link_urls] || []
