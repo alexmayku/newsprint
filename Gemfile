@@ -34,7 +34,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 # Background jobs & caching
-gem "sidekiq", "~> 7.0"
+gem "sidekiq", "~> 8.1"
 gem "redis", "~> 5.0"
 
 # Inertia.js + Vite
