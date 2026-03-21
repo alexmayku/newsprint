@@ -39,7 +39,7 @@ gem "redis", "~> 5.0"
 
 # Inertia.js + Vite
 gem "inertia_rails", "~> 3.0"
-gem "vite_rails", "~> 3.0"
+gem "vite_rails", "~> 3.10"
 
 # Authentication
 gem "omniauth", "~> 2.0"
