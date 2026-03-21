@@ -57,7 +57,7 @@ gem "grover", "~> 1.0"
 gem "pdf-reader", "~> 2.0"
 
 # QR codes
-gem "rqrcode", "~> 2.0"
+gem "rqrcode", "~> 3.2"
 
 # Email
 gem "postmark-rails", "~> 0.22"
