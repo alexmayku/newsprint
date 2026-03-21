@@ -50,7 +50,7 @@ gem "omniauth-rails_csrf_protection"
 gem "google-apis-gmail_v1"
 
 # Payments
-gem "stripe", "~> 12.0"
+gem "stripe", "~> 18.4"
 
 # PDF generation
 gem "grover", "~> 1.0"
